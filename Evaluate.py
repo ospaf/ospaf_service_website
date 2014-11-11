@@ -3,6 +3,8 @@ import MachineLearning.ML_Tools.sigmond
 import DataManager.GetRepoInfo
 import Get_Model
 import config
+import json
+ 
 
 def get_repo_info(repo_name):
      repo_dic={}
@@ -10,21 +12,38 @@ def get_repo_info(repo_name):
      repo_dic=MachineLearning.ML_Tools.log.loge(repo_dic)
      return repo_dic
 
+def read_model():
+   fr=open('model.txt')
+   dic={}
+   for i in fr.readlines():
+	  	dic[i.split('\t')[0].strip()]=float(i.split('\t')[1].strip())
+    
+   return dic
+
+
 def evaluate(repo_name):
-	dic_model=Get_Model.get_model()
+	dic_model=read_model()
 	dic_target=get_repo_info(repo_name)
 	factor=dic_model['constant'] 
 	for i in config.feat:
-	   if i =='name':
+	   if i =='name'or i=='description':
 	    continue
 	   else:  	
 		factor=factor+dic_model[i]*dic_target[i]
 	return factor
 
 def get_score(repo_name):
-     ful_name='https://api.github.com/repos/'+repo_name
-     return (MachineLearning.ML_Tools.sigmond.sig((evaluate(ful_name))))*100
+     #ful_name='https://api.github.com/repos/'+repo_name
+     return (MachineLearning.ML_Tools.sigmond.sig((evaluate(repo_name))))*100
+
+def call_back_json(repo_name):
+     dic={
+       'name': '%s'%(repo_name),
+       'score':'%f'%(get_score(repo_name))
+
+     }
+     return json.dumps(dic)
 
 
-
-print get_score('jimenbian/DataMining')
+if __name__ == '__main__':
+	print get_score('jimenbian/DataMining')

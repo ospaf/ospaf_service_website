@@ -7,7 +7,7 @@ from numpy import *
 def loge(mat):
   if type(mat)==dict:
     for k,v in mat.iteritems():
-    	if k=='name':
+    	if k=='name' or k=='description':
     		pass
     	else:
     	  mat[k]=log(float(v)+1)	

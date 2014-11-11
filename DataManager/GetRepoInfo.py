@@ -6,12 +6,16 @@ sys.path.append("..")
 import config
 import DM_Tools.DataConvert
 import DM_Tools.Contributor_Count
+import DM_Tools.ExtractCommitter
 
 
 def GetRepoInfo(str):
-     Info= os.popen("curl -G %s"%(str)).read()
+     name_str='https://api.github.com/repos/'+str
+     Info= os.popen("curl -G %s"%(name_str)).read()
      json_r=json.loads(Info)
      Jdict = {} 
+     commits_result=[]
+     commits_result=DM_Tools.ExtractCommitter.total_CommitSum(name_str+'/commits')
      myarr=config.feat
     
      Jdict[myarr[0]]=json_r.get('name')
@@ -42,7 +46,11 @@ def GetRepoInfo(str):
      Jdict['forkDsize']=int(Jdict['fork'])/(int(Jdict['size'])+1)
      Jdict['forkDcontributors']=int(Jdict['fork'])/(int(Jdict['contributors'])+1)
      Jdict['sizeDcontributors']=int(Jdict['size'])/(int(Jdict['contributors'])+1)
+     Jdict['description']=json_r.get('description')
+     Jdict['month_1_commit']=(int(commits_result[0])/30)*100
+     Jdict['month_3_commit']=(int(commits_result[1])/30)*100
+     Jdict['month_6_commit']=(int(commits_result[2])/30)*100
      return Jdict
 
 
-print GetRepoInfo('https://api.github.com/repos/defunkt/starling')
+#print GetRepoInfo('')
